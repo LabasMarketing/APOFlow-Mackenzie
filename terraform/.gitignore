@@ -1,0 +1,52 @@
+# Terraform State Files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Environment Variables
+terraform.tfvars
+!terraform.tfvars.example
+.env
+.env.local
+
+# AWS Credentials & Keys
+~/.aws/credentials
+~/.aws/config
+!aws-credentials.example
+!aws-config.example
+aws-credentials
+aws-config
+*.pem
+!*.pem.example
+*.key
+!*.key.example
+aws-ssh-key.pem
+aws-ssh-key.pem.
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+crash.log
+crash.*.log
+
+# Backups
+*.backup
+*.bak
+
+# Temporary
+*.tmp
+tmp/
+temp/

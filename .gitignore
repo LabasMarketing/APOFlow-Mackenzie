@@ -1,0 +1,9 @@
+node_modules
+dist
+.DS_Store
+*.tsbuildinfo
+Backend/target
+Frontend/node_modules
+Frontend/dist
+
+.env

@@ -1,0 +1,19 @@
+# APOFlow — Terraform Variables
+# Copie para terraform.tfvars e preencha os valores
+
+aws_region        = "us-east-1"
+environment       = "production"
+instance_type     = "t3.small"
+ec2_key_pair_name = "apoflow-key"   # nome exato do key pair criado na AWS
+
+# Segredos — preencha com seus valores reais
+brevo_token       = "xkeysib.SEU_TOKEN_AQUI"
+brevo_from        = "apoflowmack@gmail.com"
+jwt_secret        = "sua-chave-secreta-jwt-com-32-chars-minimo"
+
+# HTTPS
+# Use um dominio valido apontado para a EC2 se quiser certificado publico.
+# Se deixar vazio, a EC2 usa o IP publico e sobe HTTPS com certificado interno.
+apoflow_site_address = ""
+apoflow_tls_mode     = "internal"
+tls_email            = "admin@seudominio.com"

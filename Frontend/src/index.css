@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 12%;
+
+    --primary: 348 74% 47%; /* ab182d */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 20% 94%;
+    --secondary-foreground: 220 30% 20%;
+
+    --muted: 220 15% 93%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 348 74% 47%; /* ab182d */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 220 60% 30%;
+
+    --radius: 0.625rem;
+
+    --sidebar-background: 348 74% 47%; /* ab182d */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 348 74% 47%; /* ab182d */
+    --sidebar-accent: 0 0% 100%;
+    --sidebar-accent-foreground: 348 74% 47%; /* ab182d */
+    --sidebar-border: 348 74% 47%; /* ab182d */
+    --sidebar-ring: 348 74% 47%; /* ab182d */
+
+    --success: 348 74% 47%; /* ab182d */
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 205 80% 50%;
+    --info-foreground: 0 0% 100%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(220, 60%, 30%), hsl(220, 55%, 45%));
+    --gradient-accent: linear-gradient(135deg, hsl(348, 74%, 47%), hsl(348, 74%, 47%)); /* ab182d */
+    --gradient-hero: linear-gradient(135deg, hsl(220, 35%, 12%), hsl(220, 40%, 22%));
+
+    --shadow-card: 0 1px 3px 0 hsl(220 30% 12% / 0.04), 0 1px 2px -1px hsl(220 30% 12% / 0.04);
+    --shadow-elevated: 0 4px 16px -2px hsl(220 30% 12% / 0.08), 0 2px 6px -2px hsl(220 30% 12% / 0.04);
+    --shadow-glow: 0 0 20px hsl(348 74% 47% / 0.15); /* ab182d */
+
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    background-image:
+      radial-gradient(circle at top right, hsl(348 74% 47% / 0.08), transparent 22%),
+      radial-gradient(circle at bottom left, hsl(220 60% 30% / 0.08), transparent 30%);
+    .selected-invert {
+      background: #fff !important;
+      color: hsl(348, 74%, 47%) !important;
+      border-radius: 0.75rem;
+      font-weight: 700;
+      box-shadow: 0 0 0 2px hsl(348, 74%, 47% / 0.10);
+      position: relative;
+      z-index: 1;
+    }
+
+    .navlink-sidebar {
+      color: #fff;
+      transition: background 0.2s, color 0.2s;
+      border-radius: 0.75rem;
+      font-weight: 500;
+    }
+    .navlink-sidebar:hover,
+    .navlink-sidebar:focus-visible {
+      background: #fff !important;
+      color: hsl(348, 74%, 47%) !important;
+    }
+
+    .role-selected {
+      background: hsl(348, 74%, 47%) !important;
+      color: #fff !important;
+      border-radius: 0.75rem;
+      box-shadow: 0 0 0 2px hsl(220, 30%, 12% / 0.10);
+      font-weight: 700;
+      border: 1.5px solid #fff;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer utilities {
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+}
