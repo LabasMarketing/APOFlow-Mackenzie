@@ -561,6 +561,28 @@ terraform apply
 - `http://HOST/api` — API REST
 
 ---
+## Telas do Sistema 
+
+### Tela de Login
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/18892215-5ca8-4889-8c4f-683d1bf585d2" />
+
+### Tela de Adminstrador
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/195fe16f-45d7-4e1c-bd90-649dfaf044b8" />
+
+### Tela de Aluno
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/e855f5c6-ae19-4df5-bfdb-98e275e4052d" />
+
+### Tela de Orientador
+<img width="1917" height="911" alt="image" src="https://github.com/user-attachments/assets/ae3179fe-0387-4323-afd7-7095bde16d2f" />
+
+### Tela de Comissão
+<img width="1919" height="907" alt="image" src="https://github.com/user-attachments/assets/fc174808-e5ef-433f-bc95-0e900d043594" />
+
+### Tela de Coordenação
+<img width="1919" height="910" alt="image" src="https://github.com/user-attachments/assets/39162c50-0e99-4588-a765-91677dfc6025" />
+
+### Tela de Secretaria
+<img width="1919" height="908" alt="image" src="https://github.com/user-attachments/assets/40621945-1dce-40cd-b439-7b708c7f083c" />
 
 ## About
 
