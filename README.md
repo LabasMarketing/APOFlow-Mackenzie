@@ -1,78 +1,83 @@
 # APOFlow
 
-APOFlow e uma aplicacao web para gerenciar o fluxo de Atividades Programadas Obrigatorias (APOs) do PPG-CA.
-O sistema centraliza autenticacao, cadastro de usuarios, submissao de APOs, avaliacao por etapas, notificacoes e administracao de papeis institucionais.
+APOFlow é uma aplicação web para gerenciar o fluxo de Atividades Programadas Obrigatórias (APOs) do PPG-CA.
+O sistema centraliza autenticação, cadastro de usuários, submissão de APOs, avaliação por etapas, notificações e administração de papéis institucionais.
 
-Este README e a documentacao principal do projeto: arquitetura, stack, regras de negocio, execucao local, HTTPS, deploy em AWS, operacao com Docker e atualizacao de ambiente existente.
+Este README é a documentação principal do projeto: arquitetura, stack, regras de negócio, execução local, deploy em AWS e operação com Docker.
+
+---
 
 ## 1. Objetivo
 
-O APOFlow reduz processos manuais entre aluno, orientador, comissao, coordenacao e secretaria.
+O APOFlow reduz processos manuais entre aluno, orientador, comissão, coordenação e secretaria.
 Em vez de controles paralelos e trocas manuais, o sistema concentra:
 
-1. cadastro e autenticacao de usuarios
-2. submissao e reenvio de APOs
-3. avaliacao por orientador
-4. votacao por comissao
-5. decisao final pela coordenacao
-6. arquivamento e lancamento pela secretaria
-7. administracao de perfis pelo usuario administrador
+1. cadastro e autenticação de usuários
+2. submissão e reenvio de APOs
+3. avaliação por orientador
+4. votação por comissão
+5. decisão final pela coordenação
+6. arquivamento e lançamento pela secretaria
+7. administração de perfis pelo usuário administrador
 
-## 2. Estado atual do repositorio
+---
 
-Implementado neste repositorio:
+## 2. Estado atual do repositório
+
+Implementado neste repositório:
 
 - frontend React servido pelo backend Spring Boot
-- backend Java 25 com Spring Boot 4.0.6
-- MongoDB como persistencia principal
-- JWT stateless para sessao autenticada
-- OTP por e-mail para usuarios comuns
+- backend Java 25 com Spring Boot
+- MongoDB como persistência principal
+- JWT stateless para sessão autenticada
+- OTP por e-mail para usuários comuns
 - bypass de OTP para o admin fixo
-- painel administrativo para listar, filtrar, atualizar papeis e excluir usuarios
-- deploy com Docker Compose
-- proxy reverso com Caddy em 80 e 443
-- suporte a HTTPS em dois modos:
-  - internal: certificado interno/self-signed, util para localhost, IP publico e laboratorio
-   - public: certificado valido via Let's Encrypt, para dominio real apontado para a EC2
+- painel administrativo para listar, filtrar, atualizar papéis e excluir usuários
+- deploy com Docker Compose (app direto na porta 80)
+- Terraform para provisionamento em AWS EC2
 
-## 3. Regras de negocio
+---
+
+## 3. Regras de negócio
 
 ### 3.1 Cadastro e conta admin fixa
 
-- todo usuario criado via tela de registro nasce com papel aluno
+- todo usuário criado via tela de registro nasce com papel `aluno`
 - somente o admin pode promover ou rebaixar perfis
-- o admin fixo e criado automaticamente no startup
+- o admin fixo é criado automaticamente no startup
 - credenciais da conta admin fixa:
-  - e-mail: admin@mackenzie.com
-  - senha: ADMmack123
-- o admin fixo nao usa OTP
-- o admin fixo nao pode ser excluido nem alterado por fluxos administrativos padrao
+  - e-mail: `admin@mackenzie.com`
+  - senha: `ADMmack123`
+- o admin fixo não usa OTP
+- o admin fixo não pode ser excluído nem alterado por fluxos administrativos padrão
 
 ### 3.2 Estados de perfil permitidos
 
-Usuarios comuns podem estar apenas em um destes estados:
+Usuários comuns podem estar apenas em um destes estados:
 
 1. aluno
 2. orientador
-3. comissao
-4. orientador + comissao
-5. coordenacao
+3. comissão
+4. orientador + comissão
+5. coordenação
 6. secretaria
 
-Combinacoes como orientador + secretaria ou aluno + comissao sao invalidadas no frontend e no backend.
+Combinações como `orientador + secretaria` ou `aluno + comissão` são invalidadas no frontend e no backend.
 
 ### 3.3 Perfis e responsabilidades
 
-| Perfil | Responsabilidade principal |
-|---|---|
-| admin | gerenciar usuarios, filtros, perfis e exclusoes |
-| aluno | criar, salvar rascunho, enviar, reenviar ou desistir de APO |
-| orientador | aprovar ou devolver APO com justificativa |
-| comissao | registrar votos e parecer colegiado |
-| coordenacao | aprovar, reprovar ou devolver na etapa final |
-| secretaria | arquivar e lancar creditos |
+| Perfil      | Responsabilidade principal                                   |
+|-------------|--------------------------------------------------------------|
+| admin       | gerenciar usuários, filtros, perfis e exclusões              |
+| aluno       | criar, salvar rascunho, enviar, reenviar ou desistir de APO  |
+| orientador  | aprovar ou devolver APO com justificativa                    |
+| comissão    | registrar votos e parecer colegiado                          |
+| coordenação | aprovar, reprovar ou devolver na etapa final                 |
+| secretaria  | arquivar e lançar créditos                                   |
 
-## 4. Stack tecnologica
+---
+
+## 4. Stack tecnológica
 
 ### 4.1 Frontend
 
@@ -87,46 +92,46 @@ Combinacoes como orientador + secretaria ou aluno + comissao sao invalidadas no 
 
 ### 4.2 Backend
 
-- Java 25 LTS
-- Spring Boot 4.0.6
+- Java 25
+- Spring Boot
 - Spring Security
 - Spring Data MongoDB
 - JWT
-- Brevo HTTP API
+- Brevo HTTP API (envio de OTP por e-mail)
 
-### 4.3 Infra e operacao
+### 4.3 Infra e operação
 
 - Docker multi-stage
-- Docker Compose
-- Caddy como reverse proxy
+- Docker Compose (app exposto diretamente na porta 80)
 - MongoDB 7.0 em container
-- Terraform para AWS
+- Terraform para provisionamento AWS
 - EC2 com Elastic IP
+
+---
 
 ## 5. Arquitetura
 
-### 5.1 Visao de alto nivel
+### 5.1 Visão de alto nível
 
-```text
+```
 Browser
-  -> HTTP/HTTPS (80/443)
-  -> Caddy reverse proxy
-  -> Spring Boot (porta interna 8080)
+  -> HTTP (porta 80)
+  -> Spring Boot (porta interna 8080, mapeada para 80 pelo Compose)
   -> MongoDB
 ```
 
+> Para deploy em produção com HTTPS, consulte a seção 14 (Terraform/AWS).
+
 ### 5.2 Fluxo de runtime
 
-1. navegador acessa http://HOST ou https://HOST
-2. Caddy recebe conexao em 80/443
-3. Caddy encaminha para o container apoflow na porta interna 8080
-4. backend Spring Boot serve frontend buildado e API REST em /api
-5. frontend chama API com JWT
-6. backend persiste no MongoDB
+1. navegador acessa `http://HOST`
+2. Spring Boot serve frontend buildado e API REST em `/api`
+3. frontend chama API com JWT no header `Authorization: Bearer`
+4. backend persiste no MongoDB
 
-### 5.3 Estrutura principal do repositorio
+### 5.3 Estrutura principal do repositório
 
-```text
+```
 .
 ├── Backend/
 │   ├── pom.xml
@@ -148,9 +153,6 @@ Browser
 │   │   └── pages/
 │   ├── package.json
 │   └── vite.config.ts
-├── deploy/
-│   └── caddy/
-│       └── entrypoint.sh
 ├── terraform/
 ├── .env.example
 ├── docker-compose.yml
@@ -160,27 +162,28 @@ Browser
 
 ### 5.4 Responsabilidade por camada
 
-| Caminho | Papel |
-|---|---|
-| Frontend/src/pages | telas de negocio e dashboards |
-| Frontend/src/components | componentes reutilizaveis e layout |
-| Frontend/src/contexts | sessao autenticada e estado global |
-| Frontend/src/lib/api.ts | cliente HTTP, tipos e operacoes REST |
-| Backend/src/main/java/.../api | controllers e DTOs |
-| Backend/src/main/java/.../service | regras de negocio |
-| Backend/src/main/java/.../repository | acesso ao MongoDB |
-| Backend/src/main/java/.../config | seguranca, seed inicial e configuracoes |
-| terraform/ | provisionamento de infraestrutura AWS |
-| deploy/caddy/entrypoint.sh | geracao dinamica da configuracao HTTPS |
+| Caminho                              | Papel                                    |
+|--------------------------------------|------------------------------------------|
+| Frontend/src/pages                   | telas de negócio e dashboards            |
+| Frontend/src/components              | componentes reutilizáveis e layout       |
+| Frontend/src/contexts                | sessão autenticada e estado global       |
+| Frontend/src/lib/api.ts              | cliente HTTP, tipos e operações REST     |
+| Backend/src/main/java/.../api        | controllers e DTOs                       |
+| Backend/src/main/java/.../service    | regras de negócio                        |
+| Backend/src/main/java/.../repository | acesso ao MongoDB                        |
+| Backend/src/main/java/.../config     | segurança, seed inicial e configurações  |
+| terraform/                           | provisionamento de infraestrutura AWS    |
 
-## 6. Autenticacao e autorizacao
+---
+
+## 6. Autenticação e autorização
 
 ### 6.1 Login comum
 
-1. usuario informa e-mail e senha
+1. usuário informa e-mail e senha
 2. backend valida credenciais
 3. backend envia OTP por e-mail
-4. usuario informa OTP
+4. usuário informa OTP
 5. backend retorna JWT
 6. frontend salva JWT no localStorage
 
@@ -188,307 +191,234 @@ Browser
 
 1. admin informa e-mail e senha
 2. backend valida credenciais
-3. backend retorna JWT imediatamente
-4. nao ha etapa de OTP
+3. backend retorna JWT imediatamente (sem OTP)
 
-### 6.3 Sessao
+### 6.3 Sessão
 
-- JWT enviado em Authorization: Bearer <token>
-- respostas 401 limpam token e usuario local
-- frontend redireciona para login quando a sessao expira
+- JWT enviado em `Authorization: Bearer`
+- respostas 401 limpam token e usuário local
+- frontend redireciona para login quando a sessão expira
+
+---
 
 ## 7. Fluxos funcionais implementados
 
 ### 7.1 Aluno
-
-- registrar conta
-- fazer login
-- alterar senha
-- recuperar senha
-- editar perfil
-- criar APO
-- salvar rascunho
-- reenviar APO devolvida
-- desistir de APO
-- acompanhar status
+- registrar conta, fazer login, alterar senha, recuperar senha, editar perfil
+- criar APO, salvar rascunho, reenviar APO devolvida, desistir de APO, acompanhar status
 
 ### 7.2 Orientador
+- visualizar itens em avaliação, aprovar APO, devolver APO com justificativa
 
-- visualizar itens em avaliacao
-- aprovar APO
-- devolver APO com justificativa
+### 7.3 Comissão
+- visualizar itens pendentes, registrar voto, justificar voto
 
-### 7.3 Comissao
-
-- visualizar itens pendentes
-- registrar voto
-- justificar voto
-
-### 7.4 Coordenacao
-
-- decidir aprovacao final
-- reprovar
-- devolver para ajustes
+### 7.4 Coordenação
+- decidir aprovação final, reprovar, devolver para ajustes
 
 ### 7.5 Secretaria
-
-- visualizar itens prontos para encerramento
-- arquivar
-- lancar creditos
+- visualizar itens prontos para encerramento, arquivar, lançar créditos
 
 ### 7.6 Administrador
+- listar usuários, filtrar por nome/e-mail/perfil, alterar papéis válidos, excluir usuários
+- impedir alteração da conta admin fixa
 
-- listar usuarios
-- filtrar por nome/e-mail
-- filtrar por perfil
-- alterar papeis validos
-- excluir usuarios
-- impedir alteracao da conta admin fixa
+---
 
 ## 8. Portas publicadas
 
-### 8.1 Portas em uso no Compose atual
+| Porta | Uso                  | Exposição                                |
+|-------|----------------------|------------------------------------------|
+| 80    | HTTP (app principal) | pública (mapeada do 8080 interno)        |
+| 8080  | Spring Boot          | interna entre containers                 |
+| 27017 | MongoDB              | publicada localmente no host do Compose  |
 
-| Porta | Uso | Exposicao |
-|---|---|---|
-| 80 | HTTP no proxy reverso | publica |
-| 443 | HTTPS no proxy reverso | publica |
-| 8080 | Spring Boot | interna entre containers |
-| 27017 | MongoDB | publicada localmente no host do Compose |
+Acesso principal: `http://localhost`
 
-### 8.2 Resultado pratico
+> A porta 8080 não precisa ser acessada diretamente; o Compose mapeia 80 → 8080.
 
-- acesso web principal: http://localhost
-- acesso HTTPS local: https://localhost
-- API via proxy: http://localhost/api ou https://localhost/api
-- backend nao precisa ser acessado publicamente em :8080
+---
 
-## 9. HTTPS
+## 9. Variáveis de ambiente
 
-### 9.1 Modos suportados
-
-| Modo | Variavel | Quando usar | Resultado |
-|---|---|---|---|
-| internal | APOFLOW_TLS_MODE=internal | localhost, IP publico, laboratorio AWS, ambiente sem dominio | HTTPS com certificado interno/self-signed |
-| public | APOFLOW_TLS_MODE=public | dominio real apontado para a EC2 | HTTPS com certificado Let's Encrypt |
-
-### 9.2 Regras importantes
-
-- certificado publico confiavel exige dominio valido apontado para a instancia
-- Let's Encrypt nao emite certificado confiavel para IP publico bruto
-- para uso com IP sem dominio, o modo recomendado e internal
-- no modo internal, o navegador exibira aviso de certificado ate confiar na CA local
-
-### 9.3 Variaveis do proxy
-
-| Variavel | Obrigatoria | Exemplo | Descricao |
-|---|---|---|---|
-| APOFLOW_SITE_ADDRESS | sim | localhost, 3.91.10.20, apoflow.seudominio.com | endereco que o proxy atende |
-| APOFLOW_TLS_MODE | sim | internal ou public | define o tipo de TLS |
-| TLS_EMAIL | obrigatoria no modo public | admin@seudominio.com | e-mail usado pelo ACME |
-
-## 10. Variaveis de ambiente
-
-Copie .env.example para .env na raiz do projeto:
+Copie `.env.example` para `.env` na raiz do projeto:
 
 ```bash
 cp .env.example .env
 ```
 
-### 10.1 Variaveis da aplicacao
+### 9.1 Variáveis da aplicação
 
-| Variavel | Descricao | Exemplo |
-|---|---|---|
-| MONGODB_URI | string de conexao do MongoDB | mongodb://mongodb:27017/apoflow |
-| EMAIL_ENABLED | habilita envio real de e-mail | true |
-| BREVO_API_KEY | chave da API Brevo | xkeysib-... |
-| BREVO_FROM | remetente de e-mail | no-reply@seudominio.com |
-| JWT_SECRET | segredo JWT com pelo menos 32 caracteres | uma-chave-muito-forte... |
+| Variável                    | Descrição                                     | Exemplo                                                 |
+|-----------------------------|-----------------------------------------------|---------------------------------------------------------|
+| `MONGODB_URI`               | string de conexão do MongoDB                  | `mongodb://mongodb:27017/apoflow`                       |
+| `EMAIL_ENABLED`             | habilita envio real de e-mail                 | `true`                                                  |
+| `BREVO_TOKEN`               | token da API Brevo                            | `xkeysib-...`                                           |
+| `BREVO_FROM`                | remetente de e-mail                           | `no-reply@seudominio.com`                               |
+| `APP_BASE_URL`              | URL base da aplicação                         | `http://localhost`                                      |
+| `APP_CORS_ALLOWED_ORIGINS`  | origens permitidas pelo CORS                  | `http://localhost,http://localhost:3000`                 |
 
-### 10.2 Variaveis do proxy HTTPS
+---
 
-| Variavel | Descricao | Exemplo |
-|---|---|---|
-| APOFLOW_SITE_ADDRESS | host/ip/dominio do proxy | localhost |
-| APOFLOW_TLS_MODE | internal ou public | internal |
-| TLS_EMAIL | e-mail para Let's Encrypt | admin@seudominio.com |
+## 10. Execução local com Docker
 
-## 11. Execucao local com Docker
-
-### 11.1 Pre-requisitos
+### 10.1 Pré-requisitos
 
 - Docker
 - plugin Docker Compose
 
-### 11.2 Passo a passo
+### 10.2 Passo a passo
 
 ```bash
-git clone https://github.com/JP18090/APOFlow.git
-cd APOFlow
+git clone https://github.com/LabasMarketing/APOFlow-Mackenzie.git
+cd APOFlow-Mackenzie
 cp .env.example .env
 ```
 
-Edite o arquivo .env conforme o ambiente.
+Edite o arquivo `.env` conforme o ambiente.
 
-### 11.3 Subir aplicacao
+### 10.3 Subir aplicação
 
 ```bash
 docker compose --env-file .env up -d --build
 ```
 
-### 11.4 Verificar status
+### 10.4 Verificar status
 
 ```bash
 docker compose ps
-docker compose logs -f proxy apoflow
+docker compose logs -f apoflow mongodb
 ```
 
-### 11.5 Acessar
+### 10.5 Acessar
 
-- http://localhost
-- https://localhost
-- http://localhost/api
-- https://localhost/api
+- `http://localhost`
+- `http://localhost/api`
 
-### 11.6 Parar
+### 10.6 Parar
 
 ```bash
 docker compose down
 ```
 
-### 11.7 Rebuild apos alteracoes
+### 10.7 Rebuild após alterações
 
 ```bash
 docker compose --env-file .env up -d --build
 ```
 
+---
+
+## 11. Exemplo de `.env` para localhost
+
+```env
+MONGODB_URI=mongodb://mongodb:27017/apoflow
+EMAIL_ENABLED=true
+BREVO_TOKEN=xkeysib-SEU_TOKEN_AQUI
+BREVO_FROM=no-reply@seudominio.com
+APP_BASE_URL=http://localhost
+APP_CORS_ALLOWED_ORIGINS=http://localhost,http://localhost:3000,http://localhost:5173
+```
+
+---
+
 ## 12. Como o Dockerfile funciona
 
-O Dockerfile usa tres estagios:
+O Dockerfile usa três estágios:
 
-1. frontend-build
-   - instala dependencias Node
-   - executa npm run build
-2. backend-build
-   - instala Maven
-   - copia frontend buildado para src/main/resources/static
-   - gera jar Spring Boot
-3. imagem final
-   - executa apenas o jar com Java 25 JRE
+1. **frontend-build** — instala dependências Node (node:20-alpine) e executa `npm run build`
+2. **backend-build** — usa eclipse-temurin:25-jdk, instala Maven, copia o frontend buildado para `src/main/resources/static` e gera o JAR Spring Boot
+3. **imagem final** — executa apenas o JAR com eclipse-temurin:25-jre
 
-Beneficios:
+Benefícios: imagem final sem Node e Maven, frontend e backend publicados juntos no mesmo container.
 
-- imagem final menor
-- runtime sem Node e Maven
-- frontend e backend publicados juntos
+---
 
 ## 13. API principal
 
-### 13.1 Autenticacao
+### 13.1 Autenticação
 
-- POST /api/auth/register
-- POST /api/auth/login
-- POST /api/auth/verify-otp
-- POST /api/auth/change-password
-- POST /api/auth/forgot-password
-- POST /api/auth/reset-password
-- GET /api/auth/first-access/{email}
+| Método | Rota                              | Descrição                        |
+|--------|-----------------------------------|----------------------------------|
+| POST   | `/api/auth/register`              | Cadastro de novo usuário         |
+| POST   | `/api/auth/login`                 | Login com e-mail e senha         |
+| POST   | `/api/auth/verify-otp`            | Verificação do OTP recebido      |
+| POST   | `/api/auth/change-password`       | Alteração de senha autenticada   |
+| POST   | `/api/auth/forgot-password`       | Solicitar redefinição de senha   |
+| POST   | `/api/auth/reset-password`        | Redefinir senha via token        |
+| GET    | `/api/auth/first-access/{email}`  | Verificar primeiro acesso        |
 
-### 13.2 Usuario autenticado
+### 13.2 Usuário autenticado
 
-- GET /api/users/me
-- PUT /api/users/me
-- DELETE /api/users/me
+| Método | Rota           | Descrição                    |
+|--------|----------------|------------------------------|
+| GET    | `/api/users/me` | Dados do usuário logado      |
+| PUT    | `/api/users/me` | Atualizar perfil próprio     |
+| DELETE | `/api/users/me` | Excluir própria conta        |
 
-### 13.3 Administracao de usuarios
+### 13.3 Administração de usuários
 
-- GET /api/users
-- PUT /api/users/{userId}/roles
-- DELETE /api/users/{userId}
+| Método | Rota                        | Descrição                          |
+|--------|-----------------------------|------------------------------------|
+| GET    | `/api/users`                | Listar todos os usuários           |
+| PUT    | `/api/users/{userId}/roles` | Atualizar papéis de um usuário     |
+| DELETE | `/api/users/{userId}`       | Excluir usuário                    |
 
 ### 13.4 APOs
 
-- GET /api/apos
-- POST /api/apos
-- POST /api/apos/rascunho
-- PUT /api/apos/{id}/aluno/reenviar
-- POST /api/apos/{id}/aluno/desistir
-- POST /api/apos/{id}/orientador/aprovar
-- POST /api/apos/{id}/orientador/devolver
-- POST /api/apos/{id}/comissao/voto
-- POST /api/apos/{id}/coordenacao/decisao?action=aprovar|reprovar|devolver
-- POST /api/apos/{id}/secretaria/arquivar
-- POST /api/apos/{id}/secretaria/lancar
+| Método | Rota                                                   | Descrição                          |
+|--------|--------------------------------------------------------|------------------------------------|
+| GET    | `/api/apos`                                            | Listar APOs do contexto            |
+| POST   | `/api/apos`                                            | Submeter nova APO                  |
+| POST   | `/api/apos/rascunho`                                   | Salvar APO como rascunho           |
+| PUT    | `/api/apos/{id}/aluno/reenviar`                        | Reenviar APO devolvida             |
+| POST   | `/api/apos/{id}/aluno/desistir`                        | Desistir da APO                    |
+| POST   | `/api/apos/{id}/orientador/aprovar`                    | Orientador aprova APO              |
+| POST   | `/api/apos/{id}/orientador/devolver`                   | Orientador devolve com justificativa|
+| POST   | `/api/apos/{id}/comissao/voto`                         | Comissão registra voto             |
+| POST   | `/api/apos/{id}/coordenacao/decisao?action=aprovar\|reprovar\|devolver` | Decisão final |
+| POST   | `/api/apos/{id}/secretaria/arquivar`                   | Secretaria arquiva                 |
+| POST   | `/api/apos/{id}/secretaria/lancar`                     | Secretaria lança créditos          |
 
 ### 13.5 Outros endpoints
 
-- GET /api/students
-- GET /api/notifications?recipient=...
+| Método | Rota                           | Descrição                          |
+|--------|--------------------------------|------------------------------------|
+| GET    | `/api/students`                | Listar alunos                      |
+| GET    | `/api/notifications?recipient=`| Notificações por perfil            |
+
+---
 
 ## 14. Deploy em AWS com Terraform
 
-### 14.1 O que terraform/ provisiona
+### 14.1 O que `terraform/` provisiona
 
-- VPC
-- subnet publica
-- internet gateway
-- security group
-- EC2 Ubuntu
-- Elastic IP
+- VPC, subnet pública, internet gateway
+- security group (22, 80, 443)
+- EC2 Ubuntu com Elastic IP
 - volume EBS dedicado ao Docker
 
-### 14.2 Security group esperado
+### 14.2 Variáveis relevantes do Terraform
 
-- 22/tcp para SSH
-- 80/tcp para HTTP
-- 443/tcp para HTTPS
+| Variável               | Descrição                         |
+|------------------------|-----------------------------------|
+| `brevo_token`          | token da API Brevo                |
+| `brevo_from`           | remetente configurado             |
+| `apoflow_site_address` | domínio, hostname ou IP           |
 
-Objetivo atual: publicar a aplicacao somente por 80/443.
-
-### 14.3 Variaveis relevantes do Terraform
-
-| Variavel | Descricao |
-|---|---|
-| brevo_api_key | chave da API Brevo |
-| brevo_from | remetente configurado |
-| jwt_secret | segredo JWT |
-| apoflow_site_address | dominio, hostname ou IP do proxy |
-| apoflow_tls_mode | internal ou public |
-| tls_email | e-mail usado no modo public |
-
-### 14.4 Exemplo de terraform.tfvars
-
-Opcao A: HTTPS com IP publico e certificado interno
+### 14.3 Exemplo de `terraform.tfvars`
 
 ```hcl
 aws_region            = "us-east-1"
 environment           = "production"
 instance_type         = "t3.small"
 ec2_key_pair_name     = "apoflow-key"
-brevo_api_key         = "xkeysib-SUA_CHAVE_AQUI"
+brevo_token           = "xkeysib-SEU_TOKEN_AQUI"
 brevo_from            = "no-reply@seudominio.com"
-jwt_secret            = "uma-chave-com-pelo-menos-32-caracteres"
-apoflow_site_address  = ""
-apoflow_tls_mode      = "internal"
-tls_email             = ""
+apoflow_site_address  = "3.91.10.20"
 ```
 
-Opcao B: HTTPS publico valido com dominio
-
-```hcl
-aws_region            = "us-east-1"
-environment           = "production"
-instance_type         = "t3.small"
-ec2_key_pair_name     = "apoflow-key"
-brevo_api_key         = "xkeysib-SUA_CHAVE_AQUI"
-brevo_from            = "no-reply@seudominio.com"
-jwt_secret            = "uma-chave-com-pelo-menos-32-caracteres"
-apoflow_site_address  = "apoflow.seudominio.com"
-apoflow_tls_mode      = "public"
-tls_email             = "admin@seudominio.com"
-```
-
-### 14.5 Deploy inicial
+### 14.4 Deploy inicial
 
 ```bash
 cd terraform
@@ -498,29 +428,7 @@ terraform validate
 terraform apply
 ```
 
-### 14.6 Atualizar AWS com mudancas do repositorio
-
-Se a infraestrutura ja existe, atualize sem recriar EC2. Use Terraform quando for necessario ajustar recursos de infra (security group, user-data, variaveis bootstrap).
-
-```bash
-cd /workspaces/APOFlow/terraform
-terraform init
-terraform plan
-terraform apply
-```
-
-Depois confira as saidas:
-
-```bash
-terraform output app_url
-terraform output app_http_url
-terraform output app_https_url
-terraform output ssh_command
-```
-
-### 14.7 Atualizar EC2 existente sem recriar tudo
-
-Fluxo recomendado para atualizar aplicacao reaproveitando instancia e volume existentes:
+### 14.5 Atualizar EC2 existente sem recriar tudo
 
 ```bash
 EC2_IP=<SEU_IP_PUBLICO>
@@ -530,10 +438,10 @@ cd /opt/apoflow
 git pull --ff-only
 docker compose --env-file .env up -d --build
 docker compose ps
-docker compose logs --tail 100 proxy apoflow
+docker compose logs --tail 100 apoflow mongodb
 ```
 
-Se .env ainda nao existir na EC2, crie uma unica vez antes do deploy:
+Se `.env` ainda não existir na EC2, crie antes do deploy:
 
 ```bash
 cd /opt/apoflow
@@ -542,85 +450,11 @@ nano .env
 docker compose --env-file .env up -d --build
 ```
 
-Se houver alteracoes locais na EC2 e git pull --ff-only falhar, revise antes de qualquer sobrescrita:
+---
 
-```bash
-cd /opt/apoflow
-git status
-git pull --ff-only
-docker compose --env-file .env up -d --build
-```
+## 15. Operação do Docker
 
-### 14.8 Configurar dominio para HTTPS publico
-
-1. crie registro A apontando o dominio para o Elastic IP da EC2
-2. defina no terraform.tfvars:
-   - apoflow_site_address = "seu-dominio"
-   - apoflow_tls_mode = "public"
-   - tls_email = "seu-email"
-3. execute:
-
-```bash
-cd /workspaces/APOFlow/terraform
-terraform apply
-```
-
-4. aguarde o Caddy emitir certificado automaticamente
-
-## 15. Subida em maquina nova
-
-```bash
-git clone https://github.com/JP18090/APOFlow.git
-cd APOFlow
-cp .env.example .env
-nano .env
-docker compose --env-file .env up -d --build
-docker compose ps
-docker compose logs -f proxy apoflow
-```
-
-### 15.1 Exemplo de .env para localhost
-
-```env
-MONGODB_URI=mongodb://mongodb:27017/apoflow
-EMAIL_ENABLED=true
-BREVO_API_KEY=xkeysib-SUA_CHAVE_AQUI
-BREVO_FROM=no-reply@seudominio.com
-JWT_SECRET=sua-chave-super-segura-com-32-caracteres-ou-mais
-APOFLOW_SITE_ADDRESS=localhost
-APOFLOW_TLS_MODE=internal
-TLS_EMAIL=
-```
-
-### 15.2 Exemplo de .env para EC2 com IP publico
-
-```env
-MONGODB_URI=mongodb://mongodb:27017/apoflow
-EMAIL_ENABLED=true
-BREVO_API_KEY=xkeysib-SUA_CHAVE_AQUI
-BREVO_FROM=no-reply@seudominio.com
-JWT_SECRET=sua-chave-super-segura-com-32-caracteres-ou-mais
-APOFLOW_SITE_ADDRESS=3.91.10.20
-APOFLOW_TLS_MODE=internal
-TLS_EMAIL=
-```
-
-### 15.3 Exemplo de .env para EC2 com dominio
-
-```env
-MONGODB_URI=mongodb://mongodb:27017/apoflow
-EMAIL_ENABLED=true
-BREVO_API_KEY=xkeysib-SUA_CHAVE_AQUI
-BREVO_FROM=no-reply@seudominio.com
-JWT_SECRET=sua-chave-super-segura-com-32-caracteres-ou-mais
-APOFLOW_SITE_ADDRESS=apoflow.seudominio.com
-APOFLOW_TLS_MODE=public
-TLS_EMAIL=admin@seudominio.com
-```
-
-## 16. Operacao do Docker
-
-### 16.1 Comandos essenciais
+### 15.1 Comandos essenciais
 
 ```bash
 docker compose --env-file .env up -d --build
@@ -631,87 +465,80 @@ docker compose down
 docker compose down --volumes --remove-orphans
 ```
 
-### 16.2 Logs por servico
+### 15.2 Logs por serviço
 
 ```bash
-docker compose logs -f proxy
 docker compose logs -f apoflow
 docker compose logs -f mongodb
 ```
 
-### 16.3 Testes de HTTP e HTTPS
+### 15.3 Testes de acesso
 
 ```bash
 curl -I http://localhost
-curl -k -I https://localhost
-curl -k https://localhost/api/users/me
+curl http://localhost/api/users/me
 ```
 
-## 17. Troubleshooting
+---
 
-### 17.1 HTTP funciona, HTTPS nao sobe
+## 16. Troubleshooting
 
-Possiveis causas:
-
-- APOFLOW_TLS_MODE=public sem dominio valido
-- TLS_EMAIL ausente no modo public
-- porta 443 bloqueada na AWS
-
-### 17.2 HTTPS abre com aviso de certificado
-
-Comportamento esperado quando:
-
-- APOFLOW_TLS_MODE=internal
-- acesso por IP publico
-- ausencia de dominio com certificado publico
-
-### 17.3 Aplicacao nao sobe apos pull
-
-Verifique:
+### 16.1 Aplicação não sobe após pull
 
 ```bash
 docker compose config
-docker compose logs --tail 100 proxy apoflow mongodb
+docker compose logs --tail 100 apoflow mongodb
 ```
 
-### 17.4 MongoDB nao conecta
-
-Valide se o container mongodb esta ativo e se a URI esta correta:
+### 16.2 MongoDB não conecta
 
 ```bash
 docker compose ps
 docker compose logs mongodb
 ```
 
-### 17.5 Login do admin falha
+Valide se `MONGODB_URI` está correta no `.env`.
 
-Confirme que o backend concluiu startup e aplicou seed inicial.
+### 16.3 Login do admin falha
+
+Confirme que o backend concluiu startup e aplicou o seed inicial.
 
 Credenciais esperadas:
+- e-mail: `admin@mackenzie.com`
+- senha: `ADMmack123`
 
-- e-mail: admin@mackenzie.com
-- senha: ADMmack123
+### 16.4 E-mails OTP não chegam
 
-## 18. Arquivos de referencia
+Verifique se `EMAIL_ENABLED=true` e se `BREVO_TOKEN` está correto no `.env`.
 
-- README.md: documentacao principal
-- PackSP2.md: documentacao complementar
-- Frontend/docs/use-cases.md: casos de uso da interface
-- terraform/README.md: documentacao especifica de infraestrutura
-- terraform/QUICKSTART.md: guia rapido de provisionamento
+---
 
-## 19. Resumo operacional rapido
+## 17. Arquivos de referência
 
-### 19.1 Rodar localmente
+| Arquivo                        | Conteúdo                                         |
+|--------------------------------|--------------------------------------------------|
+| `README.md`                    | documentação principal (este arquivo)            |
+| `PackSP2.md`                   | documentação complementar detalhada              |
+| `Frontend/docs/use-cases.md`   | casos de uso da interface                        |
+| `terraform/README.md`          | documentação específica de infraestrutura        |
+| `terraform/QUICKSTART.md`      | guia rápido de provisionamento                   |
+| `Segurity.md`                  | considerações e políticas de segurança           |
+
+---
+
+## 18. Resumo operacional rápido
+
+### Rodar localmente
 
 ```bash
-git clone https://github.com/JP18090/APOFlow.git
-cd APOFlow
+git clone https://github.com/LabasMarketing/APOFlow-Mackenzie.git
+cd APOFlow-Mackenzie
 cp .env.example .env
 docker compose --env-file .env up -d --build
+# acesse http://localhost
 ```
 
-### 19.2 Atualizar EC2 existente
+### Atualizar EC2 existente
 
 ```bash
 ssh -i ~/Downloads/apoflow-key.pem ubuntu@SEU_IP
@@ -720,18 +547,21 @@ git pull --ff-only
 docker compose --env-file .env up -d --build
 ```
 
-### 19.3 Aplicar mudancas de Terraform
+### Aplicar mudanças de Terraform
 
 ```bash
-cd /workspaces/APOFlow/terraform
+cd terraform
 terraform init
 terraform apply
 ```
 
-### 19.4 Acesso esperado
+### Acesso esperado
 
-- http://HOST
-- https://HOST
-- https://HOST/api
+- `http://HOST` — aplicação principal
+- `http://HOST/api` — API REST
 
-Para HTTPS publico sem aviso de certificado, use dominio real com APOFLOW_TLS_MODE=public.
+---
+
+## About
+
+Sistema de Atividades Programadas Obrigatórias dos Alunos de Pós-Graduação e Mestrado do Mackenzie — PPG-CA.
