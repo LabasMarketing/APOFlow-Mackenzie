@@ -584,6 +584,6 @@ terraform apply
 ### Tela de Secretaria
 <img width="1919" height="908" alt="image" src="https://github.com/user-attachments/assets/40621945-1dce-40cd-b439-7b708c7f083c" />
 
-## About
+## Sobre
 
 Sistema de Atividades Programadas Obrigatórias dos Alunos de Pós-Graduação e Mestrado do Mackenzie — PPG-CA.
